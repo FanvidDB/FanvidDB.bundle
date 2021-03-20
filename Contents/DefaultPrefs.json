@@ -1,0 +1,8 @@
+[
+    {
+        "id": "fanviddb_api_key",
+        "label": "FanvidDB API Key",
+        "type": "text",
+        "default": ""
+    }
+]
