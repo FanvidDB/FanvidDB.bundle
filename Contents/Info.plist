@@ -4,15 +4,12 @@
 <dict>
 	<key>CFBundleIdentifier</key>
 	<string>com.plexapp.agents.fanviddb</string>
-	<key>PlexAgentAttributionText</key>
-	<string>
-        FanvidDB is a crowdsourced metadata resource for fanvids
-	</string>
 	<key>PlexFrameworkVersion</key>
 	<string>2</string>
 	<key>PlexPluginClass</key>
 	<string>Agent</string>
-	<key>PlexPluginCodePolicy</key>
-	<string>Elevated</string>
+  <key>PlexPluginCodePolicy</key>
+  <string>Elevated</string>
+
 </dict>
 </plist>
