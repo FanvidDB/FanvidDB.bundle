@@ -20,3 +20,8 @@ exit $$status
 fmt:
 	python3 -m black .
 	isort -rc
+
+build:
+	python build.py
+
+.PHONY: build
