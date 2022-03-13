@@ -1,29 +1,8 @@
-# Set up global variables if they're not set - for testing.
-from typing import Dict
-
-try:
-    Agent
-except NameError:
-
-    class Agent:
-        class Movies:
-            pass
-
-    class Locale:
-        class Language:
-            class NoLanguage:
-                pass
-
-    class Log:
-        def Info(message):
-            pass
-
-    Prefs = {}  # type: Dict[str, str]
-
-    class MetadataSearchResult:
-        def __init__(self, id, name, year, lang, score):
-            pass
-
+from .plex import Agent
+from .plex import Locale
+from .plex import Log
+from .plex import MetadataSearchResult
+from .plex import Prefs
 
 API_KEY = ""
 
