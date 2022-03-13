@@ -1,8 +1,10 @@
 from .plex import Agent
 from .plex import Locale
 from .plex import Log
-from .plex import MetadataSearchResult
 from .plex import Prefs
+from .plex import SearchResult
+from .search import build_search_query
+from .search import search
 from .validate_prefs import is_valid_api_key
 
 API_KEY_PREF = "fanviddb_api_key"
@@ -34,28 +36,70 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
     contributes_to = None
     accepts_from = None
     languages = [Locale.Language.NoLanguage]  # type: ignore
+    version = 1
 
-    def search(self, results, media, lang, manual=False):
-        # Trigger with "Match" from video context menu.
-        api_key = Prefs[API_KEY_PREF]
-        Log.Info("asdf - api key is {}".format(api_key))
-        for a in dir(media):
-            if not a.startswith("_"):
-                Log.Info("%s: %s", a, getattr(media, a))
-        Log.Info("fdsa")
-        results.Append(
-            MetadataSearchResult(
-                id="youtube-dl|{}|{}".format(media.filename, media.openSubtitlesHash),
-                name=media.title,
-                year=None,
-                lang=lang,
-                score=100,
-            )
+    def search(
+        self, results, tree, hints, lang, manual=False, partial=False, primary=True
+    ):
+        """
+        Triggered by the "Match" action from the video context menu. Queries fanviddb.com
+        to get a list of potential matches (with scores) for a given fanvid. Only requires
+        a subset of data to be able to display the matching interface.
+
+        Called from agentkit.AgentKit._search. The results should be modified in-place.
+        They will be sorted by score by the caller.
+
+        results: Empty object container to fill with potential matches.
+        tree: MediaTree object - should have metadata about the parent objects in the current database.
+        hints: agentkit.Movie object (subclass of agentkit.MediaObject)
+        lang: selected language?
+        manual: ???
+        partial: ???
+        primary: ???
+        """
+        Log.Debug("results: %s", results)
+        Log.Debug("tree: %s", tree)
+        Log.Debug("hints: %s", hints)
+        Log.Debug("lang: %s", lang)
+        Log.Debug("manual: %s", manual)
+        Log.Debug("partial: %s", partial)
+        Log.Debug("primary: %s", primary)
+
+        for attr in dir(hints):
+            if attr.startswith("_"):
+                continue
+            Log.Debug("hints.%s: %s", attr, getattr(hints, attr))
+
+        query = build_search_query(hints.filename)
+        search_results = search(
+            api_key=Prefs[API_KEY_PREF],
+            query=query,
         )
 
-        results.Sort("score", descending=True)
+        for index, result in enumerate(search_results["fanvids"]):
+            # SearchResult also supports:
+            # - type
+            # - matched (?)
+            # - parentName
+            # - parentID
+            # - parentGUID
+            # - parentIndex
+            results.add(
+                SearchResult(
+                    index=index,
+                    id=result["uuid"],
+                    guid=result["uuid"],
+                    name=result["title"],
+                    year=result["premiere_date"],
+                    thumb=result["thumbnail_url"],
+                    score=100,
+                )
+            )
 
     def update(self, metadata, media, lang):
+        """
+        Given a single fanvid id, fetch the full record from fanviddb.com.
+        """
         Log.Info("asdf")
         metadata.rating = 4.2  # out of 10 lmao
         metadata.content_rating = "mature rating"
