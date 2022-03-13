@@ -39,8 +39,13 @@ def copy_assets():
 
 def copy_source():
     for filename in os.listdir(SRC_DIR):
+        src_file = os.path.join(SRC_DIR, filename)
+        if os.path.isdir(src_file):
+            continue
+        if filename.endswith("_test.py"):
+            continue
         shutil.copyfile(
-            os.path.join(SRC_DIR, filename),
+            src_file,
             os.path.join(CODE_DIR, filename),
         )
 

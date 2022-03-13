@@ -3,8 +3,9 @@ from .plex import Locale
 from .plex import Log
 from .plex import MetadataSearchResult
 from .plex import Prefs
+from .validate_prefs import is_valid_api_key
 
-API_KEY = ""
+API_KEY_PREF = "fanviddb_api_key"
 
 
 def Start():
@@ -12,11 +13,16 @@ def Start():
 
 
 def ValidatePrefs():
-    Log.Info("Validating metadata against preferences!")
-    global API_KEY
-    API_KEY = Prefs.get("fanviddb_api_key")
-    Log.Info("API Key")
-    Log.Info(API_KEY)
+    """
+    Called when a user changes their preferences for this plugin. Unfortunately there
+    doesn't seem to actually be a way to _return_ a validation error, but we can at least
+    log it.
+    """
+    Log.Info("Validating API key")
+    if is_valid_api_key(Prefs[API_KEY_PREF]):
+        Log.Info("API key is valid")
+    else:
+        Log.Info("Invalid API key: {}".format(Prefs[API_KEY_PREF]))
 
 
 class FanvidDBAgent(Agent.Movies):  # type: ignore
@@ -28,7 +34,8 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
     languages = [Locale.Language.NoLanguage]  # type: ignore
 
     def search(self, results, media, lang, manual=False):
-        Log.Info("asdf")
+        api_key = Prefs[API_KEY_PREF]
+        Log.Info("asdf - api key is {}".format(api_key))
         for a in dir(media):
             if not a.startswith("_"):
                 Log.Info("%s: %s", a, getattr(media, a))
@@ -46,6 +53,7 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
         results.Sort("score", descending=True)
 
     def update(self, metadata, media, lang):
+        Log.Info("asdf")
         metadata.rating = 4.2  # out of 10 lmao
         metadata.content_rating = "mature rating"
         # metadata.art

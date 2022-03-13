@@ -2,8 +2,6 @@
 # directly within the global namespace without needing to be explicitly
 # imported. This file provides some shims so that we can run tests and
 # then strip out the imports during the build process.
-from typing import Dict
-
 try:
     Agent = Agent
 except NameError:
@@ -35,7 +33,11 @@ except NameError:
 try:
     Prefs = Prefs
 except NameError:
-    Prefs = {}  # type: Dict[str, str]
+
+    class Prefs:
+        def __getitem__(self, name):
+            pass
+
 
 try:
     MetadataSearchResult = MetadataSearchResult
