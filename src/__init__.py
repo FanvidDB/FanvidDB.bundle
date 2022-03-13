@@ -2,8 +2,8 @@ from .plex import Agent
 from .plex import Locale
 from .plex import Log
 from .plex import Prefs
-from .plex import SearchResult
-from .search import build_search_query
+from .search import fanvid_to_search_result
+from .search import get_search_filename
 from .search import search
 from .validate_prefs import is_valid_api_key
 
@@ -70,31 +70,13 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
                 continue
             Log.Debug("hints.%s: %s", attr, getattr(hints, attr))
 
-        query = build_search_query(hints.filename)
         search_results = search(
             api_key=Prefs[API_KEY_PREF],
-            query=query,
+            filename=get_search_filename(hints.filename),
         )
 
-        for index, result in enumerate(search_results["fanvids"]):
-            # SearchResult also supports:
-            # - type
-            # - matched (?)
-            # - parentName
-            # - parentID
-            # - parentGUID
-            # - parentIndex
-            results.add(
-                SearchResult(
-                    index=index,
-                    id=result["uuid"],
-                    guid=result["uuid"],
-                    name=result["title"],
-                    year=result["premiere_date"],
-                    thumb=result["thumbnail_url"],
-                    score=100,
-                )
-            )
+        for fanvid in search_results["fanvids"]:
+            results.add(fanvid_to_search_result(fanvid))
 
     def update(self, metadata, media, lang):
         """

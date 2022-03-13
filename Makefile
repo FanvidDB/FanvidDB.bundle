@@ -19,7 +19,7 @@ exit $$status
 
 fmt:
 	python3 -m black .
-	isort -rc
+	isort -rc -y
 
 build:
 	python build.py

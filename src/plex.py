@@ -66,6 +66,6 @@ except NameError:
 
         def __init__(self, **kwargs):
             for k, v in kwargs.items():
-                if k not in allowed_attrs:
+                if k not in self.allowed_attrs:
                     raise TypeError("Invalid attr for SearchResult: {}".format(k))
                 setattr(self, k, v)
