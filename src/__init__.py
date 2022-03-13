@@ -10,6 +10,8 @@ API_KEY_PREF = "fanviddb_api_key"
 
 def Start():
     Log.Info("Starting FanvidDB metadata agent!")
+    # Call ValidatePrefs so that if there are any issues it shows up in the logs.
+    ValidatePrefs()
 
 
 def ValidatePrefs():
@@ -34,6 +36,7 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
     languages = [Locale.Language.NoLanguage]  # type: ignore
 
     def search(self, results, media, lang, manual=False):
+        # Trigger with "Match" from video context menu.
         api_key = Prefs[API_KEY_PREF]
         Log.Info("asdf - api key is {}".format(api_key))
         for a in dir(media):
