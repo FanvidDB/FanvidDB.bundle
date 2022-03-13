@@ -8,7 +8,7 @@ py2lint:
 	status=0;\
 flake8 . || status=1;\
 isort -rc . --check || status=1;\
-vulture . --min-confidence=100 --exclude=.git,.mypy_cache,.pytest_cache,.venv,__pycache__ || status=1;\
+vulture . --min-confidence=100 --exclude=build,.git,.mypy_cache,.pytest_cache,.venv,__pycache__ || status=1;\
 exit $$status
 
 py3lint:

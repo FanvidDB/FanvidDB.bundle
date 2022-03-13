@@ -1,4 +1,6 @@
 # Set up global variables if they're not set - for testing.
+from typing import Dict
+
 try:
     Agent
 except NameError:
