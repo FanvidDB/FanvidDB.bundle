@@ -11,8 +11,7 @@ _Installation requires Plex Media Server._
    make build
    ln -s "$PWD/build/" "$HOME/Library/Application Support/Plex Media Server/Plug-ins/FanvidDB.bundle"
    ```
-3. On Settings > Server > Plugins, show advanced settings and make sure "Disable capability checking" is checked.
-4. Restart your Plex server.
+3. Restart your Plex server.
 
 ## Why build the plugin instead of just developing the code directly?
 
