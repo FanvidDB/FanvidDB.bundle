@@ -29,7 +29,7 @@ Plex uses Python 2.7. Plugins can have the following structure:
  |-Info.plist
 ```
 
-It also runs a special embedded version of python that has some unusual properties, like additional superglobal variables.
+It also runs a special embedded version of python that has some unusual properties, like additional superglobal variables (which are defined in the Framework.bundle that is included in the base Plex Media Server installation).
 
 Treating the final plugin as a built artifact allows developers to use modern python development practices, and the build process can take any necessary steps to ensure that the resulting code will also run inside Plex.
 
