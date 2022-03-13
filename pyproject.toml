@@ -8,13 +8,3 @@ skip = [
 	".venv",
 	"__pycache__",
 ]
-
-[tool.vulture]
-exclude = [
-	".git",
-	".mypy_cache",
-	".pytest_cache",
-	".venv",
-	"__pycache__",
-]
-min_confidence = 100

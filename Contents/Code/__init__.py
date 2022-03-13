@@ -18,7 +18,7 @@ except NameError:
         def Info(message):
             pass
 
-    Prefs: Dict[str, str] = {}
+    Prefs = {}  # type: Dict[str, str]
 
     class MetadataSearchResult:
         def __init__(self, id, name, year, lang, score):
