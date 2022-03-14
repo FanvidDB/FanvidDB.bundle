@@ -49,5 +49,5 @@ pytest
 
 ## Troubleshooting (Mac)
 
-Assuming you are developing on a machine that is also running plex media server, you can find the latest [logs](https://support.plex.tv/articles/200250417-plex-media-server-log-files/) at `~/Library/Logs/Plex Media Server/PMS Plugin Logs/com.plexapp.agents.fanviddb.log`
+Assuming you are developing on a machine that is also running plex media server, you can find the latest [logs](https://support.plex.tv/articles/200250417-plex-media-server-log-files/) at `~/Library/Logs/Plex Media Server/PMS Plugin Logs/com.fanviddb.agents.fanvids.log`
 
