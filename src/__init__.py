@@ -1,12 +1,14 @@
 from typing import Optional
 
+from .fanviddb import fanvid_to_search_result
+from .fanviddb import get_fanvid
+from .fanviddb import get_search_filename
+from .fanviddb import list_fanvids
+from .fanviddb import update_metadata_from_fanvid
 from .plex import Agent
 from .plex import Locale
 from .plex import Log
 from .plex import Prefs
-from .search import fanvid_to_search_result
-from .search import get_search_filename
-from .search import search
 from .validate_prefs import is_valid_api_key
 
 API_KEY_PREF = "fanviddb_api_key"
@@ -43,11 +45,11 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
     contributes_to = None
     accepts_from = None
     languages = [Locale.Language.NoLanguage]  # type: ignore
-    version = 1
+    # version is used to change some functionality within a single Framework version.
+    # However, metadata management for Movie objects only works in version `0`.
+    version = 0
 
-    def search(
-        self, results, tree, hints, lang, manual=False, partial=False, primary=True
-    ):
+    def search(self, results, media, lang, tree=None):
         """
         Triggered by the "Match" action from the video context menu. Queries fanviddb.com
         to get a list of potential matches (with scores) for a given fanvid. Only requires
@@ -57,34 +59,30 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
         They will be sorted by score by the caller.
 
         results: Empty object container to fill with potential matches.
-        tree: MediaTree object - should have metadata about the parent objects in the current database.
-        hints: agentkit.Movie object (subclass of agentkit.MediaObject)
+        media: agentkit.Movie object (subclass of agentkit.MediaObject)
         lang: selected language?
-        manual: ???
-        partial: ???
-        primary: ???
+        tree: MediaTree object - should have metadata about the parent objects in the current database.
+
+        This could support some additional args but it's not clear what they're for.
         """
         Log.Debug("results: %s", results)
-        Log.Debug("tree: %s", tree)
-        Log.Debug("hints: %s", hints)
+        Log.Debug("media: %s", media)
         Log.Debug("lang: %s", lang)
-        Log.Debug("manual: %s", manual)
-        Log.Debug("partial: %s", partial)
-        Log.Debug("primary: %s", primary)
+        Log.Debug("tree: %s", tree)
 
-        for attr in dir(hints):
+        for attr in dir(media):
             if attr.startswith("_"):
                 continue
-            Log.Debug("hints.%s: %s", attr, getattr(hints, attr))
+            Log.Debug("media.%s: %s", attr, getattr(media, attr))
 
         api_key = Prefs[API_KEY_PREF]
         if not api_key:
-            Log.Info("API Key is not set. Not able to search.")
+            Log.Info("API Key is not set. Not able to list fanvids from fanviddb.com.")
             return
 
-        search_results = search(
+        search_results = list_fanvids(
             api_key=Prefs[API_KEY_PREF],
-            filename=get_search_filename(hints.filename),
+            filename=get_search_filename(media.filename),
         )
 
         for fanvid in search_results["fanvids"]:
@@ -92,40 +90,20 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
 
     def update(self, metadata, media, lang):
         """
-        Given a single fanvid id, fetch the full record from fanviddb.com.
+        Given a single fanvid id, fetch the full record from fanviddb.com. This is triggered
+        at various times, including after a match. However, there are a number of non-obvious
+        reasons the caller might short-circuit.
+
+        metadata: the metadata object. Manipulate this object in-place; after return it will be written to the database.
+        media: the object from the database.
+        lang: selected language?
+
+        This could support some additional args but it's not clear what they're for.
         """
-        Log.Info("asdf")
-        metadata.rating = 4.2  # out of 10 lmao
-        metadata.content_rating = "mature rating"
-        # metadata.art
-        # metadata.chapters
-        metadata.themes = ["theme a", "theme b"]
-        metadata.quotes = ["quote me once", "quote me twice"]
-        metadata.year = 2222
-        # metadata.duration
-        metadata.rating_count = 5
-        metadata.genres = ["genre a", "genre b"]
-        # metadata.title
-        metadata.tagline = "tagline believe it"
-        metadata.content_rating_age = 55
-        # metadata.writers
-        # metadata.collections
-        metadata.trivia = "sounds trivial to me"
-        # metadata.tags
-        # metadata.audience_rating_image
-        # metadata.rating_image
-        # metadata.producers = ['producer a', 'producer b']
-        metadata.audience_rating = 6.9
-        metadata.studio = "Studio 60"
-        # metadata.posters
-        # metadata.countries
-        # metadata.roles
-        # metadata.originally_available_at
-        # metadata.title_sort
-        # metadata.original_title
-        metadata.summary = "summarize but good"
-        # metadata.reviews
-        # metadata.directors
-        # metadata.extras
-        # metadata.banners
-        # metadata.similar
+        Log.Info("Updating metadata for %s", metadata)
+        api_key = Prefs[API_KEY_PREF]
+        if not api_key:
+            Log.Info("API Key is not set. Not able to get fanvids from fanviddb.com.")
+            return
+        fanvid = get_fanvid(api_key, metadata.id)
+        update_metadata_from_fanvid(metadata, fanvid)

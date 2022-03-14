@@ -71,3 +71,23 @@ except NameError:
                 if k not in self.allowed_attrs:
                     raise TypeError("Invalid attr for SearchResult: {}".format(k))
                 setattr(self, k, v)
+
+
+try:
+    Proxy
+except NameError:
+
+    class Proxy:
+        @classmethod
+        def Preview(cls, content, sort_order):
+            return content
+
+
+try:
+    HTTP
+except NameError:
+
+    class HTTP:
+        class Request:
+            def __init__(self, url):
+                self.content = url
