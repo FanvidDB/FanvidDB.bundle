@@ -32,6 +32,7 @@ jobs:
       - checkout
       - python/install-packages:
           pkg-manager: pip
+          pip-dependency-file: requirements-dev.txt
       - run:
           name: run tests
           command: |
