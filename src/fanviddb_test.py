@@ -39,7 +39,7 @@ def test_update_metadata_from_fanvid__summary():
     # This creates an object that allows setting of arbitrary attributes.
     metadata = MockMetadata()
     update_metadata_from_fanvid(metadata, fanvid)
-    assert metadata.summary == fanvid["summary"]
+    assert fanvid["summary"] in metadata.summary
 
 
 def test_update_metadata_from_fanvid__rating():
@@ -106,3 +106,10 @@ def test_update_metadata_from_fanvid__creators():
     assert people[0].role == "Creator"
     assert people[1].name == "vidder2"
     assert people[1].role == "Creator"
+
+
+def test_update_metadata_from_fanvid__content_notes():
+    fanvid = FanvidFactory(content_notes=["graphic-violence"])
+    metadata = MockMetadata()
+    update_metadata_from_fanvid(metadata, fanvid)
+    assert "graphic-violence" in metadata.summary

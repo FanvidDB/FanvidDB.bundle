@@ -124,3 +124,9 @@ def update_metadata_from_fanvid(metadata, fanvid):
             role = metadata.roles.new()
             role.role = "Creator"
             role.name = creator
+
+    if fanvid["content_notes"]:
+        metadata.summary = "Content Notes: {}\n\n{}".format(
+            ", ".join(fanvid["content_notes"]),
+            metadata.summary,
+        )
