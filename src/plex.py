@@ -1,6 +1,8 @@
 # Plex provides a number of "superglobal" variables that are available
 # directly within the global namespace without needing to be explicitly
 # imported. This file provides some minimal shims so that tests can run.
+from typing import Optional
+
 try:
     Agent = Agent
 except NameError:
@@ -37,7 +39,7 @@ try:
 except NameError:
 
     class Prefs:
-        def __getitem__(self, name):
+        def __getitem__(self, name):  # type: (str) -> Optional[str]
             pass
 
 

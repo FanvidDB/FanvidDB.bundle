@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .plex import Agent
 from .plex import Locale
 from .plex import Log
@@ -23,10 +25,15 @@ def ValidatePrefs():
     log it.
     """
     Log.Info("Validating API key")
-    if is_valid_api_key(Prefs[API_KEY_PREF]):
-        Log.Info("API key is valid")
+    api_key = Prefs[API_KEY_PREF]  # type: Optional[str]
+
+    if api_key:
+        if is_valid_api_key(api_key):
+            Log.Info("API key is valid")
+        else:
+            Log.Info("Invalid API key: {}".format(Prefs[API_KEY_PREF]))
     else:
-        Log.Info("Invalid API key: {}".format(Prefs[API_KEY_PREF]))
+        Log.Info("API key is not set")
 
 
 class FanvidDBAgent(Agent.Movies):  # type: ignore
@@ -69,6 +76,11 @@ class FanvidDBAgent(Agent.Movies):  # type: ignore
             if attr.startswith("_"):
                 continue
             Log.Debug("hints.%s: %s", attr, getattr(hints, attr))
+
+        api_key = Prefs[API_KEY_PREF]
+        if not api_key:
+            Log.Info("API Key is not set. Not able to search.")
+            return
 
         search_results = search(
             api_key=Prefs[API_KEY_PREF],
