@@ -1,4 +1,5 @@
 import datetime
+from operator import attrgetter
 
 from .factories_test import FanvidFactory
 from .factories_test import MockMetadata
@@ -25,22 +26,57 @@ def test_fanvid_to_search_result():
     assert search_result.thumb == fanvid["thumbnail_url"]
 
 
-def test_update_metadata_from_fanvid():
+def test_update_metadata_from_fanvid__title():
+    fanvid = FanvidFactory(title="Title")
+    # This creates an object that allows setting of arbitrary attributes.
+    metadata = MockMetadata()
+    update_metadata_from_fanvid(metadata, fanvid)
+    assert metadata.title == "Title"
+
+
+def test_update_metadata_from_fanvid__summary():
+    fanvid = FanvidFactory()
+    # This creates an object that allows setting of arbitrary attributes.
+    metadata = MockMetadata()
+    update_metadata_from_fanvid(metadata, fanvid)
+    assert metadata.summary == fanvid["summary"]
+
+
+def test_update_metadata_from_fanvid__rating():
+    fanvid = FanvidFactory()
+    # This creates an object that allows setting of arbitrary attributes.
+    metadata = MockMetadata()
+    update_metadata_from_fanvid(metadata, fanvid)
+    assert metadata.content_rating == fanvid["rating"]
+
+
+def test_update_metadata_from_fanvid__thumbnails():
+    fanvid = FanvidFactory()
+    # This creates an object that allows setting of arbitrary attributes.
+    metadata = MockMetadata()
+    update_metadata_from_fanvid(metadata, fanvid)
+    assert metadata.art[fanvid["thumbnail_url"]] == fanvid["thumbnail_url"]
+    assert metadata.posters[fanvid["thumbnail_url"]] == fanvid["thumbnail_url"]
+
+
+def test_update_metadata_from_fanvid__length():
+    fanvid = FanvidFactory()
+    # This creates an object that allows setting of arbitrary attributes.
+    metadata = MockMetadata()
+    update_metadata_from_fanvid(metadata, fanvid)
+    assert metadata.duration == fanvid["length"]
+
+
+def test_update_metadata_from_fanvid__date():
     fanvid = FanvidFactory(premiere_date="2019-08-24")
     # This creates an object that allows setting of arbitrary attributes.
     metadata = MockMetadata()
     update_metadata_from_fanvid(metadata, fanvid)
-    assert metadata.title == fanvid["title"]
-    assert metadata.summary == fanvid["summary"]
-    assert metadata.content_rating == fanvid["rating"]
     assert metadata.originally_available_at == datetime.date(2019, 8, 24)
     assert metadata.year == 2019
-    assert metadata.art[fanvid["thumbnail_url"]] == fanvid["thumbnail_url"]
-    assert metadata.posters[fanvid["thumbnail_url"]] == fanvid["thumbnail_url"]
-    assert metadata.duration == fanvid["length"]
 
 
-def test_update_metadata_from_fanvid__invalid_date():
+def test_update_metadata_from_fanvid__date__invalid():
     # This shouldn't be possible but just in case.
     fanvid = FanvidFactory(premiere_date="2019-02-29")
     # This creates an object that allows setting of arbitrary attributes.
@@ -50,7 +86,7 @@ def test_update_metadata_from_fanvid__invalid_date():
     assert metadata.year == 2019
 
 
-def test_update_metadata_from_fanvid__completely_wrong_date():
+def test_update_metadata_from_fanvid__date__nonsense_data():
     # This shouldn't be possible but just in case.
     fanvid = FanvidFactory(premiere_date="quick-brown fox")
     # This creates an object that allows setting of arbitrary attributes.
@@ -58,3 +94,15 @@ def test_update_metadata_from_fanvid__completely_wrong_date():
     update_metadata_from_fanvid(metadata, fanvid)
     assert metadata.originally_available_at is None
     assert metadata.year is None
+
+
+def test_update_metadata_from_fanvid__creators():
+    fanvid = FanvidFactory(creators=["vidder1", "vidder2"])
+    metadata = MockMetadata()
+    update_metadata_from_fanvid(metadata, fanvid)
+    people = sorted(metadata.roles._items, key=attrgetter("name"))
+    assert len(people) == 2
+    assert people[0].name == "vidder1"
+    assert people[0].role == "Creator"
+    assert people[1].name == "vidder2"
+    assert people[1].role == "Creator"

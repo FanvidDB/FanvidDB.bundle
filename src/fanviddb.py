@@ -114,5 +114,13 @@ def update_metadata_from_fanvid(metadata, fanvid):
         except Exception as e:
             Log.Error(str(e))
 
-    # Plex stores duration in milliseconds; FanvidDB does as well.
-    metadata.duration = fanvid["length"]
+    # Plex stores duration in milliseconds; FanvidDB does as well (but it uses floats to do it).
+    metadata.duration = int(fanvid["length"])
+
+    # metadata.roles is a Framework.modelling.attributes.SetObject.
+    if fanvid["creators"]:
+        metadata.roles.clear()
+        for creator in fanvid["creators"]:
+            role = metadata.roles.new()
+            role.role = "Creator"
+            role.name = creator
