@@ -35,8 +35,11 @@ def get_search_filename(hints_filename):
 
 def list_fanvids(api_key, filename):
     url = "https://fanviddb.com/api/fanvids"
-    Log.Info("Searching fanviddb at %s", url)
-    response = requests.get(url, {"filename": filename}, headers={"X-Api-Key": api_key})
+    search_filename = get_search_filename(filename)
+    Log.Info("Searching fanviddb at %s for %s", url, search_filename)
+    response = requests.get(
+        url, {"filename": search_filename}, headers={"X-Api-Key": api_key}
+    )
     try:
         fanvids = response.json()
     except RequestsJSONDecodeError:
