@@ -87,7 +87,8 @@ def fanvid_to_search_result(fanvid):
         guid=guid,
         name=fanvid["title"],
         year=year,
-        thumb=proxy_url(fanvid["thumbnail_url"]),
+        # thumb has to be bytes or unicode, not a ProxyObject
+        thumb=fanvid["thumbnail_url"],
         score=str(int(fanvid["relevance"] * 100)),
     )
 
