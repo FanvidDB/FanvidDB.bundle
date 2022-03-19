@@ -36,7 +36,7 @@ def get_search_filename(hints_filename):
 def list_fanvids(api_key, filename):
     url = "https://fanviddb.com/api/fanvids"
     Log.Info("Searching fanviddb at %s", url)
-    response = requests.get(url, headers={"X-Api-Key": api_key})
+    response = requests.get(url, {"filename": filename}, headers={"X-Api-Key": api_key})
     try:
         fanvids = response.json()
     except RequestsJSONDecodeError:
@@ -88,7 +88,7 @@ def fanvid_to_search_result(fanvid):
         name=fanvid["title"],
         year=year,
         thumb=proxy_url(fanvid["thumbnail_url"]),
-        score=100,
+        score=str(int(fanvid["relevance"] * 100)),
     )
 
 

@@ -15,7 +15,7 @@ def test_get_search_filename():
 
 
 def test_fanvid_to_search_result():
-    fanvid = FanvidFactory()
+    fanvid = FanvidFactory(relevance=0.6)
     search_result = fanvid_to_search_result(fanvid)
     assert search_result.id == fanvid["uuid"]
     assert search_result.guid == "com.fanviddb.agents.fanvids://{}?lang=xn".format(
@@ -24,6 +24,7 @@ def test_fanvid_to_search_result():
     assert search_result.name == fanvid["title"]
     assert search_result.year == int(fanvid["premiere_date"].split("-")[0])
     assert search_result.thumb == fanvid["thumbnail_url"]
+    assert search_result.score == "60"
 
 
 def test_update_metadata_from_fanvid__title():

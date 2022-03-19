@@ -16,6 +16,7 @@ class FanvidFactory(factory.Factory):
     length = 200.0
     creators = ["vidder1"]
     content_notes = ["no-warnings-apply"]
+    relevance = 0
 
 
 class MockSetItem:
